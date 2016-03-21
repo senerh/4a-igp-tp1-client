@@ -1,7 +1,4 @@
-package Client;
-
-import Server.Commun;
-import Server.Message;
+package model;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,14 +6,13 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-public class ClientModel extends Observable {
+public class Client extends Observable {
 
-    private static final int PORT = 1025;
+    private static final int PORT = 3000;
     private String user;
     private String password;
     private InetAddress serverAddress;
@@ -24,18 +20,16 @@ public class ClientModel extends Observable {
     private BufferedReader in;
     private PrintStream out;
     private String receivedMsg;
-
-    public ClientModel() {
-        super();
+    private List<String> listReceivedMails;
+    
+    public Client() {
+    	listReceivedMails = new ArrayList<String>();
     }
 
-    public ClientModel(String serverName, String user, String password) throws IOException {
-        this.serverAddress = InetAddress.getByName(serverName);
-        this.user = user;
-        this.password = password;
-    }
-
-    public void connect() throws IOException {
+    public void connect(String serverName, String user, String password) throws IOException {
+    	this.user = user;
+    	this.password = password;
+    	serverAddress = InetAddress.getByName(serverName);
         socket = new Socket(serverAddress, PORT);
 
         System.out.println("Connexion avec le serveur.");
@@ -52,23 +46,27 @@ public class ClientModel extends Observable {
     }
 
     public void disconnect() {
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    	if (socket != null) {
+    		commandeQUIT();
+    		try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    	}
     }
 
-    public List<String> getMails() {
+    public void receiveMails() {
         int nbMessages = commandeSTAT();
 
-        List<String> listMessages = new ArrayList<String>();
+        listReceivedMails.clear();
 
         for (int i = 1 ; i <= nbMessages ; i++) {
-            listMessages.add(commandeRETR(i));
+            listReceivedMails.add(commandeRETR(i));
         }
-
-        return listMessages;
+        
+        setChanged();
+	    notifyObservers();
     }
 
     private boolean receive() {
@@ -114,7 +112,7 @@ public class ClientModel extends Observable {
         return tabTailleMessage;
     }
 
-    public String commandeRETR(int numeroMessage) {
+    private String commandeRETR(int numeroMessage) {
         send("RETR " + numeroMessage);
         receive();
 
@@ -128,7 +126,19 @@ public class ClientModel extends Observable {
 
         return mail;
     }
+    
+    public boolean commandeDELE(int numeroMessage) {
+    	send("DELE " + numeroMessage);
+        return receive();
+    }
+    
+    private boolean commandeQUIT() {
+    	send("QUIT");
+        return receive();
+    }
 
-
+	public List<String> getReceivedMails() {
+		return listReceivedMails;
+	}
 
 }

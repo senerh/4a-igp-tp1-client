@@ -10,7 +10,7 @@ public class Commun {
 	/**
 	 * Port du serveur POP3
 	 */
-	public final static int PORT = 1025;
+	public final static int PORT = 3000;
 	
 	/**
 	 * Etat du serveur POP3
