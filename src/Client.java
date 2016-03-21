@@ -1,4 +1,4 @@
-import java.io.BufferedReader;
+/*import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Client {
 
-	private static final int PORT = 110;
+	private static final int PORT = 1025;
 	private String user;
 	private String password;
 	private InetAddress serverAddress;
@@ -81,3 +81,4 @@ public class Client {
 		out.println(msg);
 	}
 }
+*/

@@ -1,14 +1,15 @@
+import javax.swing.*;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.List;
 
 
-public class Main {
+public class OldMain {
 	
 	public static void main(String args[]) {
-		Client client = null;
+		/*Client client = null;
 		try {
-			client = new Client("134.214.119.118", "HAKAN", "SNIPER");
+			client = new Client("localhost", "HAKAN", "SNIPER");
 		} catch (UnknownHostException e) {
 			System.out.println("L'adresse serveur " + "" + " n'est pas joignable.");
 		} catch (IOException e) {
@@ -19,6 +20,7 @@ public class Main {
 		for (String mail : listMails) {
 			System.out.println(mail);
 		}
+		*/
 	}
 
 }
