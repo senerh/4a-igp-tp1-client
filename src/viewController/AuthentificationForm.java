@@ -88,11 +88,12 @@ public class AuthentificationForm extends JPanel {
             String server = serverField.getText();
 
             try {
+                clientModel.disconnect();
                 clientModel.connect(server, user, password);
                 clientModel.receiveMails();
             } catch (IOException e) {
             	JOptionPane.showMessageDialog(AuthentificationForm.this,
-                        "Vérifiez que les données saisies sont correctes et que le serveur est démarré.",
+                        "VÃ©rifiez que les donnÃ©es saisies sont correctes et que le serveur est dÃ©marrÃ©.",
                         "Erreur lors du la connexion au serveur",
                         JOptionPane.ERROR_MESSAGE);
             }

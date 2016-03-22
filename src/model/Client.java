@@ -12,7 +12,7 @@ import java.util.Observable;
 
 public class Client extends Observable {
 
-    private static final int PORT = 3000;
+    private static final int PORT = 110;
     private String user;
     private String password;
     private InetAddress serverAddress;
@@ -20,10 +20,10 @@ public class Client extends Observable {
     private BufferedReader in;
     private PrintStream out;
     private String receivedMsg;
-    private List<String> listReceivedMails;
+    private List<Mail> listReceivedMails;
     
     public Client() {
-    	listReceivedMails = new ArrayList<String>();
+    	listReceivedMails = new ArrayList<>();
     }
 
     public void connect(String serverName, String user, String password) throws IOException {
@@ -90,14 +90,19 @@ public class Client extends Observable {
     }
 
     private int commandeSTAT() {
-        send("STAT ");
+        send("STAT");
         receive();
 
         return Integer.parseInt(receivedMsg.split(" ")[1]);
     }
 
+    public void commandeRESET() {
+        send("RSET");
+        receive();
+    }
+
     private int[] commandeLIST() {
-        send("LIST ");
+        send("LIST");
 
         receive();
         int nbMessages = Integer.parseInt(receivedMsg.split(" ")[1]);
@@ -112,19 +117,19 @@ public class Client extends Observable {
         return tabTailleMessage;
     }
 
-    private String commandeRETR(int numeroMessage) {
+    private Mail commandeRETR(int numeroMessage) {
         send("RETR " + numeroMessage);
         receive();
 
-        String mail = "";
+        String content = "";
         receive();
 
         while (!receivedMsg.equals(".")) {
-            mail = mail + receivedMsg;
+            content = content + "\n" + receivedMsg;
             receive();
         }
 
-        return mail;
+        return new Mail(content, numeroMessage);
     }
     
     public boolean commandeDELE(int numeroMessage) {
@@ -137,7 +142,7 @@ public class Client extends Observable {
         return receive();
     }
 
-	public List<String> getReceivedMails() {
+	public List<Mail> getReceivedMails() {
 		return listReceivedMails;
 	}
 

@@ -4,8 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import model.Client;
 
@@ -30,8 +29,12 @@ public class Window extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 	        public void windowClosing(WindowEvent e) {
+				int dialogResult = JOptionPane.showConfirmDialog (null, "Confirmer la suppression ?","Warning",JOptionPane.YES_NO_OPTION);
+				if(dialogResult == JOptionPane.NO_OPTION){
+					clientModel.commandeRESET();
+				}
 	            client.disconnect();
-	            System.exit(-1);
+	            System.exit(0);
 	        }
 		});
 

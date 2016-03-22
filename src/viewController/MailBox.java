@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -14,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import model.Client;
+import model.Mail;
 
 public class MailBox extends JPanel implements Observer {
 
@@ -32,7 +34,7 @@ public class MailBox extends JPanel implements Observer {
 	private JPanel header;
 	
 	private int currentMail;
-	private List<String> listMails;
+	private List<Mail> listMails;
 	
 	public MailBox(Client client) {
 		this.client = client;
@@ -73,7 +75,7 @@ public class MailBox extends JPanel implements Observer {
 				if (currentMail <= 0) {
 					btPrevious.setVisible(false);
 				}
-				lblMail.setText(listMails.get(currentMail));
+				lblMail.setText(listMails.get(currentMail).getContent());
 			}
 		});
 		
@@ -85,43 +87,44 @@ public class MailBox extends JPanel implements Observer {
 				if (currentMail >= listMails.size() - 1) {
 					btNext.setVisible(false);
 				}
-				lblMail.setText(listMails.get(currentMail));
+				lblMail.setText(listMails.get(currentMail).getContent());
 			}
 		});
 		
 		btDelete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				client.commandeDELE(currentMail + 1);
+				client.commandeDELE(listMails.get(currentMail).getNumeroMail());
 				listMails.remove(currentMail);
 				if (listMails.size() == 0) {
 					JOptionPane.showMessageDialog(MailBox.this,
-		                    "Message supprimé.",
+		                    "Message supprimÃ©.",
 		                    "Vous n'avez plus aucun message.",
 		                    JOptionPane.INFORMATION_MESSAGE);
 					btPrevious.setVisible(false);
 					btNext.setVisible(false);
 					btDelete.setVisible(false);
+					lblMail.setVisible(false);
 				} else if (listMails.size() == 1) {
 					JOptionPane.showMessageDialog(MailBox.this,
-		                    "Message supprimé.",
+		                    "Message supprimÃ©.",
 		                    "Information",
 		                    JOptionPane.INFORMATION_MESSAGE);
 					btPrevious.setVisible(false);
 					btNext.setVisible(false);
 					btDelete.setVisible(true);
 					currentMail = 0;
-					lblMail.setText(listMails.get(currentMail));
+					lblMail.setText(listMails.get(currentMail).getContent());
 				} else {
 					JOptionPane.showMessageDialog(MailBox.this,
-		                    "Message supprimé.",
+		                    "Message supprimÃ©.",
 		                    "Information",
 		                    JOptionPane.INFORMATION_MESSAGE);
 					btPrevious.setVisible(false);
 					btNext.setVisible(true);
 					btDelete.setVisible(true);
 					currentMail = 0;
-					lblMail.setText(listMails.get(currentMail));
+					lblMail.setText(listMails.get(currentMail).getContent());
 				}
 			}
 		});
@@ -134,7 +137,7 @@ public class MailBox extends JPanel implements Observer {
 		int nbMails = listMails.size();
 		if (nbMails == 0) {
 			JOptionPane.showMessageDialog(MailBox.this,
-                    "Aucun message reçu",
+                    "Aucun message reÃ§u",
                     "Vous n'avez aucun message.",
                     JOptionPane.INFORMATION_MESSAGE);
 			btPrevious.setVisible(false);
@@ -142,23 +145,22 @@ public class MailBox extends JPanel implements Observer {
 			btDelete.setVisible(false);
 		} else if (nbMails == 1) {
 			JOptionPane.showMessageDialog(MailBox.this,
-                    "1 message reçu",
+                    "1 message reÃ§u",
                     "Vous avez 1 message.",
                     JOptionPane.INFORMATION_MESSAGE);
 			btPrevious.setVisible(false);
 			btNext.setVisible(false);
 			btDelete.setVisible(true);
-			lblMail.setText(listMails.get(currentMail));
+			lblMail.setText(listMails.get(currentMail).getContent());
 		} else {
 			JOptionPane.showMessageDialog(MailBox.this,
-                    nbMails + " messages reçus",
+                    nbMails + " messages reÃ§us",
                     "Vous avez " + nbMails + " messages.",
                     JOptionPane.INFORMATION_MESSAGE);
 			btPrevious.setVisible(false);
 			btNext.setVisible(true);
 			btDelete.setVisible(true);
-			lblMail.setText(listMails.get(currentMail));
+			lblMail.setText(listMails.get(currentMail).getContent());
 		}
 	}
-
 }
