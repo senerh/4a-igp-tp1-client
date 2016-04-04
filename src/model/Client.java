@@ -1,26 +1,32 @@
 package model;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
 public class Client extends Observable {
 
-    private static final int PORT = 110;
+    private static final int PORT = 1026;
     private String user;
     private String password;
     private InetAddress serverAddress;
-    private Socket socket;
+    private SSLSocket socket;
     private BufferedReader in;
     private PrintStream out;
     private String receivedMsg;
     private List<Mail> listReceivedMails;
+    private String cryptPassword;
     
     public Client() {
     	listReceivedMails = new ArrayList<>();
@@ -30,7 +36,12 @@ public class Client extends Observable {
     	this.user = user;
     	this.password = password;
     	serverAddress = InetAddress.getByName(serverName);
-        socket = new Socket(serverAddress, PORT);
+
+        SSLSocketFactory fabrique = (SSLSocketFactory) SSLSocketFactory.getDefault();
+        socket = (SSLSocket) fabrique.createSocket(serverAddress, PORT);
+
+        String[] ciphers = socket.getSupportedCipherSuites();
+        socket.setEnabledCipherSuites(ciphers);
 
         System.out.println("Connexion avec le serveur.");
 
@@ -39,6 +50,21 @@ public class Client extends Observable {
 
         if (!receive()) {
             throw new IOException("Serveur non reconnu");
+        } else {
+            String key = receivedMsg.split(" ")[4];
+            key = key.substring(1, key.length()-1);
+
+            MessageDigest m;
+            try {
+                m = MessageDigest.getInstance("MD5");
+                key += password;
+                m.update(key.getBytes(),0,key.length());
+                key = new BigInteger(1,m.digest()).toString(16);
+            } catch (NoSuchAlgorithmException e) {
+                throw new IOException("Erreur MD5");
+
+            }
+            cryptPassword = key;
         }
         if(!commandeAPOP()) {
             throw new IOException("Erreur d'authentification");
@@ -55,6 +81,8 @@ public class Client extends Observable {
             }
     	}
     }
+
+
 
     public void receiveMails() {
         int nbMessages = commandeSTAT();
@@ -85,7 +113,7 @@ public class Client extends Observable {
     }
 
     private boolean commandeAPOP() {
-        send("APOP " + user + " " + password);
+        send("APOP " + user + " " + cryptPassword);
         return receive();
     }
 
